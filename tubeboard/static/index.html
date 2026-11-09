@@ -88,14 +88,14 @@ h2{font-size:28px;line-height:1.25;margin:56px 0 4px;letter-spacing:-.03em;font-
 .sortbar{display:flex;gap:8px;margin:12px 0 18px;flex-wrap:wrap}
 .sortbar button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .board{background:var(--panel);border-radius:20px;padding:8px 8px;max-width:1240px}
-.chead,.crow{display:grid;grid-template-columns:44px 150px minmax(160px,1fr) 64px minmax(0,1.1fr);gap:0 16px;align-items:center;padding:0 16px 0 8px}
+.chead,.crow{display:grid;grid-template-columns:44px minmax(150px,max-content) minmax(160px,1fr) 64px minmax(0,1.1fr);gap:0 16px;align-items:center;padding:0 16px 0 8px}
 .chead{font-size:16px;color:var(--ink2);padding-top:10px;padding-bottom:8px}
 .chead span:nth-child(1){text-align:center}
 .crow{padding-top:7px;padding-bottom:7px;cursor:pointer;text-decoration:none;color:inherit;border-radius:12px}
 .crow:hover{background:var(--track)}
 .crow .no{font-size:24px;font-weight:900;text-align:center;color:var(--ink2)}
 .crow.top .no{color:var(--hot)}
-.crow .nm{font-size:22px;font-weight:800;letter-spacing:-.02em;white-space:nowrap}
+.crow .nm{min-width:230px;font-size:22px;font-weight:800;letter-spacing:-.02em;white-space:nowrap}
 .crow .nm::before{content:"";display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--c);margin-right:9px}
 .crow .meter{display:grid;grid-template-columns:1fr 88px;gap:10px;align-items:center}
 .crow .meter .trk{height:24px;background:var(--track);border-radius:6px;overflow:hidden}
@@ -120,6 +120,7 @@ h2{font-size:28px;line-height:1.25;margin:56px 0 4px;letter-spacing:-.03em;font-
 /* 주제 입력 */
 .ask{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:6px 0 10px}
 .ask input{flex:1 1 280px;max-width:480px;font-size:20px;font-weight:600}
+.sr{position:absolute;left:-9999px}
 .foot{margin-top:60px;color:var(--ink2);font-size:16px}
 
 @media (max-width:980px){.hero{grid-template-columns:1fr}.hero h3{font-size:34px}}
@@ -134,35 +135,44 @@ h2{font-size:28px;line-height:1.25;margin:56px 0 4px;letter-spacing:-.03em;font-
 </head>
 <body>
 <header class="mast"><div class="wrap">
-  <h1 class="brand"><svg viewBox="0 0 44 31" aria-hidden="true"><rect width="44" height="31" rx="9" fill="var(--pop)"/><path d="M18 9.5v12l10.5-6z" fill="#fff"/></svg>튜브보드</h1>
+  <h1 class="brand"><svg viewBox="0 0 44 31" aria-hidden="true"><rect width="44" height="31" rx="9" fill="var(--pop)"/><path d="M18 9.5v12l10.5-6z" fill="#fff"/></svg><span id="brand-name">튜브보드</span></h1>
   <div class="tools">
-    <label for="kind">형식 <select id="kind"><option value="all">쇼츠+롱폼</option><option value="short">쇼츠만</option><option value="long">롱폼만</option></select></label>
-    <label for="region">지역 <select id="region"></select></label>
-    <button id="refresh" title="저장된 결과를 건너뛰고 다시 읽습니다. API 한도를 씁니다.">새로 읽기</button>
+    <label for="kind"><span id="l-kind">형식</span> <select id="kind"><option value="all" id="o-all">쇼츠+롱폼</option><option value="short" id="o-short">쇼츠만</option><option value="long" id="o-long">롱폼만</option></select></label>
+    <label for="region"><span id="l-region">지역</span> <select id="region"></select></label>
+    <label for="lang"><span class="sr">Language</span> <select id="lang"><option value="ko">한국어</option><option value="en">English</option></select></label>
+    <button id="refresh">새로 읽기</button>
     <div class="quota" id="quota" aria-live="polite"></div>
   </div>
 </div></header>
 <div class="tabs"><div class="wrap" role="tablist" id="tabs">
-  <button role="tab" data-tab="popular" aria-selected="true">지금 뜨는 영상</button>
-  <button role="tab" data-tab="categories" aria-selected="false">카테고리 대결</button>
-  <button role="tab" data-tab="trends" aria-selected="false">검색어 급상승</button>
-  <button role="tab" data-tab="topic" aria-selected="false">주제로 파고들기</button>
+  <button role="tab" data-tab="popular" aria-selected="true" id="t-popular">지금 뜨는 영상</button>
+  <button role="tab" data-tab="categories" aria-selected="false" id="t-categories">카테고리 대결</button>
+  <button role="tab" data-tab="trends" aria-selected="false" id="t-trends">검색어 급상승</button>
+  <button role="tab" data-tab="topic" aria-selected="false" id="t-topic">주제로 파고들기</button>
 </div></div>
 <main><div class="wrap">
   <div id="notice"></div>
   <div id="view"></div>
-  <p class="foot">데이터 출처: YouTube Data API · Google 트렌드. 구독자 대비 배수와 중앙값은 이 프로그램이 계산한 값이며 YouTube 가 제공한 값이 아닙니다. 이 프로그램은 YouTube, Google 과 관계가 없는 비공식 도구입니다.
-    <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube 이용약관</a> · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google 개인정보처리방침</a></p>
-  <p class="foot">인스타그램은 공식 API 로 남의 릴스를 읽을 수 없어 이 화면에서 뺐습니다. 캡처로 확인하세요.</p>
+  <p class="foot"><span id="f-src"></span> <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube Terms of Service</a> · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a></p>
+  <p class="foot" id="f-ig"></p>
 </div></main>
 <script>
 const $ = s => document.querySelector(s);
-const state = {catKey: "median", kind: "all", tab: "popular", region: localStorage.getItem("region") || "KR", days: 7, topic: ""};
-const n = x => x == null ? "–" : x.toLocaleString("ko-KR");
+const QS = new URLSearchParams(location.search);
+const KO = (QS.get("lang") || localStorage.getItem("lang") || navigator.language || "ko").toLowerCase().startsWith("ko");
+const L = (ko, en) => KO ? ko : en;
+const LOC = KO ? "ko-KR" : "en-US";
+const CAT_EN = {"엔터":"Entertainment","코미디":"Comedy","영화·애니":"Film & Animation","스포츠":"Sports","동물":"Pets & Animals","노하우·스타일":"Howto & Style","자동차":"Autos","음악":"Music","과학·기술":"Science & Tech","뉴스":"News","인물·블로그":"People & Blogs","게임":"Gaming","여행":"Travel","교육":"Education"};
+const REGION_EN = {"한국":"South Korea","미국":"United States","일본":"Japan","영국":"United Kingdom","독일":"Germany","프랑스":"France","브라질":"Brazil","인도":"India","인도네시아":"Indonesia","대만":"Taiwan","베트남":"Vietnam","태국":"Thailand"};
+const ERR_EN = [["YOUTUBE_API_KEY 가 없습니다","YOUTUBE_API_KEY is missing. Put your key in the .env file (see README)."],["유튜브 하루 한도가 찼습니다","The daily YouTube API quota is used up. It resets at midnight Pacific time."],["유튜브 API 오류","YouTube API error: "],["네트워크 오류","Network error: "],["구글 트렌드를 읽지","Could not read Google Trends. Try again shortly."],["주제를 입력해","Enter a topic."],["로컬에서만","Local access only."],["예상하지 못한 오류","Unexpected error: "]];
+const tr = m => { if (KO) return m; for (const [k, v] of ERR_EN) if (m.includes(k)) return v.endsWith(": ") ? v + m.split(/[:：] ?/).slice(1).join(": ") : v; return m; };
+const cn = x => KO ? x : (CAT_EN[x] || x);
+const state = {catKey: "median", kind: "all", tab: ["popular","categories","trends","topic"].includes(QS.get("tab"))?QS.get("tab"):"popular", region: localStorage.getItem("region") || "KR", days: 7, topic: ""};
+const n = x => x == null ? "–" : x.toLocaleString(LOC);
 function el(tag, attrs, ...kids){const e=document.createElement(tag);for(const[k,v]of Object.entries(attrs||{})){if(k==="class")e.className=v;else if(k==="text")e.textContent=v;else e.setAttribute(k,v)}for(const c of kids)e.append(c);return e}
-function msg(text, err){const d=$("#notice");d.replaceChildren();if(text)d.append(el("p",{class:"msg"+(err?" err":""),role:err?"alert":"status",text}))}
-const compact = x => x>=1e8?(x/1e8).toFixed(1)+"억":x>=1e4?(x/1e4).toFixed(x>=1e6?0:1)+"만":n(x);
-function ago(iso){const d=(Date.now()-new Date(iso))/864e5; return d<1?"오늘":d<30?Math.floor(d)+"일 전":Math.floor(d/30)+"개월 전"}
+function msg(text, err){const d=$("#notice");d.replaceChildren();if(text)d.append(el("p",{class:"msg"+(err?" err":""),role:err?"alert":"status",text:err?tr(text):text}))}
+const compact = x => KO ? (x>=1e8?(x/1e8).toFixed(1)+"억":x>=1e4?(x/1e4).toFixed(x>=1e6?0:1)+"만":n(x)) : (x>=1e9?(x/1e9).toFixed(1)+"B":x>=1e6?(x/1e6).toFixed(x>=1e7?0:1)+"M":x>=1e3?(x/1e3).toFixed(x>=1e5?0:1)+"K":n(x));
+function ago(iso){const d=(Date.now()-new Date(iso))/864e5; return d<1?L("오늘","today"):d<30?L(Math.floor(d)+"일 전",Math.floor(d)+"d ago"):L(Math.floor(d/30)+"개월 전",Math.floor(d/30)+"mo ago")}
 const CATS=["엔터","코미디","영화·애니","스포츠","동물","노하우·스타일","자동차","음악","과학·기술","뉴스","인물·블로그","게임","여행","교육"];
 const hue = name => `hsl(${(Math.max(0,CATS.indexOf(name))*47+8)%360} 82% var(--cl))`;
 const dur=t=>t>=3600?Math.floor(t/3600)+":"+String(Math.floor(t%3600/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0"):Math.floor(t/60)+":"+String(t%60).padStart(2,"0");
@@ -174,9 +184,9 @@ async function call(path, params, refresh){
   setQuota(j.quotaUsed, j.quotaLimit); return j;
 }
 function setQuota(u,l){
-  const q=$("#quota"); q.replaceChildren(el("span",{},"오늘 API 사용 ",el("b",{text:n(u)})," / "+n(l)),el("i",{},el("span",{style:`width:${Math.min(100,u/l*100)}%`})));
+  const q=$("#quota"); q.replaceChildren(el("span",{},L("오늘 API 사용 ","API used today "),el("b",{text:n(u)})," / "+n(l)),el("i",{},el("span",{style:`width:${Math.min(100,u/l*100)}%`})));
 }
-const stamp = (at,cached)=>(cached?"저장된 결과":"방금 읽음")+", "+new Date(at*1000).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})+" 기준";
+const stamp = (at,cached)=>{const t=new Date(at*1000).toLocaleTimeString(LOC,{hour:"2-digit",minute:"2-digit"});return KO?(cached?"저장된 결과":"방금 읽음")+", "+t+" 기준":(cached?"Cached result":"Just fetched")+", as of "+t};
 const empty = t => el("p",{class:"msg",text:t});
 
 function facts(items){
@@ -187,11 +197,11 @@ function facts(items){
 function strip(videos, badge){
   const row=el("div",{class:"strip"});
   videos.forEach((v,i)=>{
-    const st=el("div",{class:"st"},el("span",{},"조회 "+n(v.views)),
-      el("span",{}, v.subs==null?"구독자 비공개":("구독자 "+compact(v.subs)), v.ratio!=null&&v.ratio<20?" · "+v.ratio.toLocaleString("ko-KR")+"배":""));
+    const st=el("div",{class:"st"},el("span",{},L("조회 ","Views ")+n(v.views)),
+      el("span",{}, v.subs==null?L("구독자 비공개","Subscribers hidden"):(L("구독자 ","Subscribers ")+compact(v.subs)), v.ratio!=null&&v.ratio<20?" · "+v.ratio.toLocaleString(LOC)+L("배","x"):""));
     const th=el("div",{class:"th"},el("img",{src:v.thumb,alt:"",loading:"lazy"}),el("span",{class:"rk",text:badge(v,i)}),
-      el("span",{class:"kind"+(v.seconds<=60?" short":""),text:(v.seconds<=60?"쇼츠 ":"롱폼 ")+dur(v.seconds)}));
-    if(v.ratio!=null && v.ratio>=20) th.append(el("span",{class:"boom",text:"구독자의 "+Math.round(v.ratio).toLocaleString("ko-KR")+"배"}));
+      el("span",{class:"kind"+(v.seconds<=60?" short":""),text:(v.seconds<=60?L("쇼츠 ","Short "):L("롱폼 ","Long "))+dur(v.seconds)}));
+    if(v.ratio!=null && v.ratio>=20) th.append(el("span",{class:"boom",text:L("구독자의 "+Math.round(v.ratio).toLocaleString(LOC)+"배",Math.round(v.ratio).toLocaleString(LOC)+"x subscribers")}));
     row.append(el("a",{class:"vcard",href:v.url,target:"_blank",rel:"noopener"},th,el("b",{text:v.title}),el("div",{class:"ch",text:v.channel}),st));
   });
   return row;
@@ -199,12 +209,12 @@ function strip(videos, badge){
 function lane(title, lead, videos, badge, emptyText, id){
   if(state.kind==="short") videos=videos.filter(v=>v.seconds<=60);
   else if(state.kind==="long") videos=videos.filter(v=>v.seconds>60);
-  if(!videos.length && state.kind!=="all") emptyText="선택한 형식의 영상이 없습니다.";
+  if(!videos.length && state.kind!=="all") emptyText=L("선택한 형식의 영상이 없습니다.","No videos of this format.");
   const f=document.createDocumentFragment(), nav=el("div",{class:"nav"});
   const row=videos.length?strip(videos,badge):empty(emptyText);
   if(videos.length){
     const go=d=>()=>row.scrollBy({left:d*row.clientWidth*0.85,behavior:"smooth"});
-    const l=el("button",{"aria-label":"왼쪽",text:"←"}), r=el("button",{"aria-label":"오른쪽",text:"→"});
+    const l=el("button",{"aria-label":L("왼쪽","Left"),text:"←"}), r=el("button",{"aria-label":L("오른쪽","Right"),text:"→"});
     l.onclick=go(-1); r.onclick=go(1); nav.append(l,r);
   }
   f.append(el("div",{class:"rowhead",id:id||""},el("div",{},el("h2",{text:title}),lead?el("p",{class:"lead",text:lead}):""),nav),row);
@@ -215,8 +225,8 @@ const rankBadge=(v,i)=>String(i+1), agoBadge=v=>ago(v.published);
 
 function hero(v, headline, items){
   const big=el("a",{class:"big",href:v.url,target:"_blank",rel:"noopener"},
-    el("img",{src:v.thumb,alt:""}),el("span",{class:"tag",text:"지금 1위"}),
-    el("div",{class:"cap"},el("b",{text:v.title}),el("span",{text:`${v.channel} · 조회 ${n(v.views)}회`})));
+    el("img",{src:v.thumb,alt:""}),el("span",{class:"tag",text:L("지금 1위","No. 1 now")}),
+    el("div",{class:"cap"},el("b",{text:v.title}),el("span",{text:`${v.channel} · ${L("조회 "+n(v.views)+"회",n(v.views)+" views")}`})));
   return el("div",{class:"hero"},big,el("div",{},headline,items));
 }
 
@@ -224,79 +234,90 @@ async function load(refresh){
   const view=$("#view"); view.replaceChildren(); msg("");
   try{
     if(state.tab==="popular"){
-      msg("읽는 중…");
+      msg(L("읽는 중…","Loading…"));
       const j=await call("/api/popular",{},refresh); msg("");
       const d=j.data, vs=d.videos;
-      if(!vs.length){view.append(empty("인기 급상승 영상이 없습니다."));return}
+      if(!vs.length){view.append(empty(L("인기 급상승 영상이 없습니다.","No trending videos.")));return}
       const small=vs.filter(v=>v.subs!=null&&v.subs<10000&&v.ratio!=null&&!v.channel.endsWith(" - Topic"));
       const med=vs.map(v=>v.views).sort((a,b)=>a-b)[Math.floor(vs.length/2)];
       const [c1,c2]=d.categories, top=vs[0];
-      const h=el("h3",{},"지금은 ",el("em",{text:c1[0]}),c2?" · ":"",c2?el("em",{text:c2[0]}):""," 천하입니다");
-      view.append(hero(top,h,facts([["인기 급상승",vs.length,"개"],["조회수 중앙값",compact(med),"회"],["쇼츠",d.shorts,"개"],["구독자 1만 미만 채널",small.length,"개"]])));
-      view.append(el("p",{class:"asof",text:stamp(j.at,j.cached)+`. 상위 ${vs.length}개 중 ${c1[0]} ${c1[1]}개${c2?", "+c2[0]+" "+c2[1]+"개":""}.`}));
-      view.append(lane("작은 채널에서 터진 영상","구독자 1만 미만 채널입니다. 구독자 덕이 아니라 영상이 먹힌 경우입니다.",small.slice().sort((a,b)=>b.ratio-a.ratio),rankBadge,"지금 인기 급상승에는 구독자 1만 미만 채널의 영상이 없습니다. 음원 자동 채널(- Topic)은 뺐습니다."));
-      view.append(lane("전체 순위","유튜브 인기 급상승 순서 그대로입니다.",vs,rankBadge,""));
-      view.append(lane("방금 올라온 순","같은 목록을 올라온 시각 기준으로 다시 정렬했습니다.",byNew(vs),agoBadge,""));
+      const h=el("h3",{},L("지금은 ","Right now: "),el("em",{text:cn(c1[0])}),c2?" · ":"",c2?el("em",{text:cn(c2[0])}):"",L(" 천하입니다"," lead"));
+      view.append(hero(top,h,facts([[L("인기 급상승","Trending"),vs.length,L("개","")],[L("조회수 중앙값","Median views"),compact(med),L("회","")],[L("쇼츠","Shorts"),d.shorts,L("개","")],[L("구독자 1만 미만 채널","Channels under 10K subs"),small.length,L("개","")]])));
+      view.append(el("p",{class:"asof",text:stamp(j.at,j.cached)+L(`. 상위 ${vs.length}개 중 ${c1[0]} ${c1[1]}개${c2?", "+c2[0]+" "+c2[1]+"개":""}.`,`. Of the top ${vs.length}: ${cn(c1[0])} ${c1[1]}${c2?", "+cn(c2[0])+" "+c2[1]:""}.`)}));
+      view.append(lane(L("작은 채널에서 터진 영상","Breakouts from small channels"),L("구독자 1만 미만 채널입니다. 구독자 덕이 아니라 영상이 먹힌 경우입니다.","Channels under 10K subscribers. The video worked, not the audience."),small.slice().sort((a,b)=>b.ratio-a.ratio),rankBadge,L("지금 인기 급상승에는 구독자 1만 미만 채널의 영상이 없습니다. 음원 자동 채널(- Topic)은 뺐습니다.","No videos from channels under 10K subscribers right now. Auto-generated \"- Topic\" music channels are excluded.")));
+      view.append(lane(L("전체 순위","Overall ranking"),L("유튜브 인기 급상승 순서 그대로입니다.","In YouTube's trending order."),vs,rankBadge,""));
+      view.append(lane(L("방금 올라온 순","Newest first"),L("같은 목록을 올라온 시각 기준으로 다시 정렬했습니다.","The same list sorted by upload time."),byNew(vs),agoBadge,""));
     } else if(state.tab==="categories"){
-      msg("카테고리별로 읽는 중…");
+      msg(L("카테고리별로 읽는 중…","Loading categories…"));
       const j=await call("/api/categories",{},refresh); msg("");
       const rows=j.data.rows;
-      const keys={median:["조회수 중앙값",r=>r.median],total:["조회수 합계",r=>r.total],top:["1위 영상 조회수",r=>Math.max(0,...r.videos.map(v=>v.views))]};
-      const board=el("div",{class:"board"}), bar=el("div",{class:"sortbar",role:"group","aria-label":"순위 기준"});
+      const keys={median:[L("조회수 중앙값","Median views"),r=>r.median],total:[L("조회수 합계","Total views"),r=>r.total],top:[L("1위 영상 조회수","Top video views"),r=>Math.max(0,...r.videos.map(v=>v.views))]};
+      const board=el("div",{class:"board"}), bar=el("div",{class:"sortbar",role:"group","aria-label":L("순위 기준","Ranking basis")});
       function draw(){
         const [label,f]=keys[state.catKey], sorted=rows.slice().sort((x,y)=>((y.count>=5)-(x.count>=5))||(f(y)-f(x))), mx=Math.max(1,...sorted.filter(r=>r.count>=5).map(f));
         bar.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===state.catKey));
-        board.replaceChildren(el("div",{class:"chead"},el("span",{text:"순위"}),el("span",{text:"카테고리"}),el("span",{text:label}),el("span",{text:"영상",style:"text-align:right"}),el("span",{text:"가장 많이 본 영상"})),...sorted.map((r,i)=>{
+        board.replaceChildren(el("div",{class:"chead"},el("span",{text:L("순위","Rank")}),el("span",{text:L("카테고리","Category")}),el("span",{text:label}),el("span",{text:L("영상","Videos"),style:"text-align:right"}),el("span",{text:L("가장 많이 본 영상","Most viewed video")})),...sorted.map((r,i)=>{
           const tv=r.videos.slice().sort((x,y)=>y.views-x.views)[0], val=f(r), w=Math.max(4,Math.min(100,Math.round(val/mx*100)));
           const a=el("a",{class:"crow"+(i<3&&r.count>=5?" top":"")+(r.count<5?" thin":""),href:"#cat-"+rows.indexOf(r),title:tv?tv.title:"",style:"--c:"+hue(r.name)},
             el("div",{class:"no",text:r.count>=5?String(i+1):"–"}),
-            el("div",{class:"nm",text:r.name}),
+            el("div",{class:"nm",text:cn(r.name)}),
             el("div",{class:"meter"},el("div",{class:"trk"},el("i",{style:`width:${w}%`})),el("strong",{text:compact(val)})),
-            el("div",{class:"cnt",text:r.count+"개"}),
+            el("div",{class:"cnt",text:r.count+L("개","")}),
             el("div",{class:"tv",text:tv?tv.title:""}));
           a.onclick=e=>{e.preventDefault();const t=document.getElementById("cat-"+rows.indexOf(r));if(t)t.scrollIntoView({behavior:"smooth",block:"start"})};
           return a;
         }));
-        $("#catlead").textContent="막대는 「"+label+"」 기준입니다. 줄을 누르면 아래에서 그 카테고리의 영상을 봅니다.";
+        $("#catlead").textContent=L("막대는 「"+label+"」 기준입니다. 줄을 누르면 아래에서 그 카테고리의 영상을 봅니다.","Bars show \""+label+"\". Click a row to see that category's videos below.");
       }
       Object.entries(keys).forEach(([k,[t]])=>{const b=el("button",{"data-k":k,text:t});b.onclick=()=>{state.catKey=k;draw()};bar.append(b)});
-      view.append(el("h2",{text:"어느 카테고리가 제일 센가",style:"margin-top:10px"}),el("p",{class:"lead",id:"catlead"}),bar,board,el("p",{class:"asof",text:stamp(j.at,j.cached)+". 카테고리마다 인기 급상승 20개를 읽고 그 카테고리에 속한 영상만 남겼습니다. 한도는 약 20유닛입니다. 영상이 5개 미만인 카테고리(흐리게 표시)는 표본이 적어 순위에서 뺐습니다."}));
+      view.append(el("h2",{text:L("어느 카테고리가 제일 센가","Which category is hottest"),style:"margin-top:10px"}),el("p",{class:"lead",id:"catlead"}),bar,board,el("p",{class:"asof",text:stamp(j.at,j.cached)+L(". 카테고리마다 인기 급상승 20개를 읽고 그 카테고리에 속한 영상만 남겼습니다. 한도는 약 20유닛입니다. 영상이 5개 미만인 카테고리(흐리게 표시)는 표본이 적어 순위에서 뺐습니다.",". For each category the top 20 trending videos are read and only that category's own videos are kept (about 20 quota units). Categories with fewer than 5 videos (dimmed) are left out of the ranking.")}));
       draw();
-      rows.forEach((r,i)=>view.append(lane(r.name,`조회수 중앙값 ${compact(r.median)}회, 영상 ${r.count}개`,r.videos.slice(0,12),rankBadge,"","cat-"+i)));
+      rows.forEach((r,i)=>view.append(lane(cn(r.name),L(`조회수 중앙값 ${compact(r.median)}회, 영상 ${r.count}개`,`Median views ${compact(r.median)}, ${r.count} videos`),r.videos.slice(0,12),rankBadge,"","cat-"+i)));
     } else if(state.tab==="trends"){
-      msg("읽는 중…");
+      msg(L("읽는 중…","Loading…"));
       const j=await call("/api/trends",{},refresh); msg("");
       const num=t=>parseInt(String(t.traffic).replace(/[^\d]/g,""))||0, mx=Math.max(1,...j.data.map(num));
-      view.append(el("h2",{text:"지금 사람들이 검색하는 것",style:"margin-top:10px"}),el("p",{class:"lead",text:stamp(j.at,j.cached)+". 구글 트렌드입니다. 이 탭은 유튜브 한도를 쓰지 않습니다."}));
+      view.append(el("h2",{text:L("지금 사람들이 검색하는 것","What people are searching now"),style:"margin-top:10px"}),el("p",{class:"lead",text:stamp(j.at,j.cached)+L(". 구글 트렌드입니다. 이 탭은 유튜브 한도를 쓰지 않습니다.",". Google Trends. This tab does not use YouTube quota.")}));
       const g=el("div",{class:"kw"});
       j.data.forEach((t,i)=>g.append(el("a",{href:"https://www.google.com/search?q="+encodeURIComponent(t.title),target:"_blank",rel:"noopener"},
         el("span",{class:"n",text:String(i+1)}),el("span",{class:"q",text:t.title}),el("span",{class:"t",text:t.traffic||""}),
         el("div",{class:"bar"},el("i",{style:`width:${Math.max(3,num(t)/mx*100)}%`})))));
-      view.append(j.data.length?g:empty("급상승 검색어가 없습니다."));
+      view.append(j.data.length?g:empty(L("급상승 검색어가 없습니다.","No trending searches.")));
     } else {
-      const input=el("input",{type:"text",placeholder:"주제 (예: 캠핑)",value:state.topic,maxlength:"60","aria-label":"주제"});
-      const days=el("select",{"aria-label":"기간"}); [[3,"3일"],[7,"7일"],[14,"14일"],[30,"30일"]].forEach(([v,t])=>{const o=el("option",{value:v,text:"최근 "+t});if(v==state.days)o.selected=true;days.append(o)});
-      const go=el("button",{class:"primary",text:"조회"});
+      const input=el("input",{type:"text",placeholder:L("주제 (예: 캠핑)","Topic (e.g. camping)"),value:state.topic,maxlength:"60","aria-label":L("주제","Topic")});
+      const days=el("select",{"aria-label":L("기간","Period")}); [3,7,14,30].forEach(v=>{const o=el("option",{value:v,text:L("최근 "+v+"일","Last "+v+" days")});if(v==state.days)o.selected=true;days.append(o)});
+      const go=el("button",{class:"primary",text:L("조회","Search")});
       go.onclick=()=>{state.topic=input.value.trim();state.days=days.value;load(false)};
       input.onkeydown=e=>{if(e.key==="Enter")go.click()};
-      view.append(el("h2",{text:"궁금한 주제, 쇼츠로 파고들기",style:"margin-top:10px"}),el("div",{class:"ask"},input,days,go));
-      if(!state.topic){view.append(empty("주제를 입력하고 조회하세요. 검색 한 번에 API 약 100유닛을 쓰고, 같은 조회는 3시간 동안 저장된 결과를 보여 줍니다."));return}
-      const out=el("div"); view.append(out); msg("읽는 중…");
+      view.append(el("h2",{text:L("궁금한 주제, 쇼츠로 파고들기","Dig into a topic through Shorts"),style:"margin-top:10px"}),el("div",{class:"ask"},input,days,go));
+      if(!state.topic){view.append(empty(L("주제를 입력하고 조회하세요. 검색 한 번에 API 약 100유닛을 쓰고, 같은 조회는 3시간 동안 저장된 결과를 보여 줍니다.","Enter a topic and search. One search uses about 100 API units; the same search shows the cached result for 3 hours.")));return}
+      const out=el("div"); view.append(out); msg(L("읽는 중…","Loading…"));
       const j=await call("/api/topic",{q:state.topic,days:state.days},refresh); msg("");
       const d=j.data;
-      out.append(facts([["쇼츠 수",d.summary.count,"개"],["조회수 중앙값",compact(d.summary.median),"회"],["최고 조회수",compact(d.summary.max),"회"],["작은 채널에서 터진 영상",d.breakouts.length,"개"]]));
-      out.append(el("p",{class:"asof",text:`「${state.topic}」 최근 ${state.days}일. ${stamp(j.at,j.cached)}. 중앙값은 조회순 상위 25개 안에서 잰 값이라, 잘 나가는 쪽의 수준입니다.`}));
-      out.append(lane("작은 채널에서 터진 영상","구독자 1만 미만 채널입니다. 조회수를 구독자 수로 나눈 배수가 큰 순서입니다.",d.breakouts,rankBadge,"해당하는 영상이 없습니다."));
-      out.append(lane("조회수 상위","",d.videos.slice(0,15),rankBadge,"쇼츠가 없습니다."));
-      out.append(lane("최신 업로드순","",byNew(d.videos).slice(0,15),agoBadge,""));
+      out.append(facts([[L("쇼츠 수","Shorts"),d.summary.count,L("개","")],[L("조회수 중앙값","Median views"),compact(d.summary.median),L("회","")],[L("최고 조회수","Top views"),compact(d.summary.max),L("회","")],[L("작은 채널에서 터진 영상","Small-channel breakouts"),d.breakouts.length,L("개","")]]));
+      out.append(el("p",{class:"asof",text:L(`「${state.topic}」 최근 ${state.days}일. ${stamp(j.at,j.cached)}. 중앙값은 조회순 상위 25개 안에서 잰 값이라, 잘 나가는 쪽의 수준입니다.`,`"${state.topic}", last ${state.days} days. ${stamp(j.at,j.cached)}. The median is measured within the top 25 by views, so it reflects the high end, not a typical video.`)}));
+      out.append(lane(L("작은 채널에서 터진 영상","Breakouts from small channels"),L("구독자 1만 미만 채널입니다. 조회수를 구독자 수로 나눈 배수가 큰 순서입니다.","Channels under 10K subscribers, ordered by views divided by subscribers."),d.breakouts,rankBadge,L("해당하는 영상이 없습니다.","No matching videos.")));
+      out.append(lane(L("조회수 상위","Most viewed"),"",d.videos.slice(0,15),rankBadge,L("쇼츠가 없습니다.","No Shorts.")));
+      out.append(lane(L("최신 업로드순","Newest uploads"),"",byNew(d.videos).slice(0,15),agoBadge,""));
     }
   }catch(e){ msg(e.message,true); }
 }
 
+(function applyLang(){
+  document.documentElement.lang=KO?"ko":"en";
+  const set=(id,ko,en)=>{const e=document.getElementById(id);if(e)e.textContent=L(ko,en)};
+  set("brand-name","튜브보드","TubeBoard");document.title=L("튜브보드","TubeBoard");set("l-kind","형식","Format");set("l-region","지역","Region");set("o-all","쇼츠+롱폼","Shorts + Long");set("o-short","쇼츠만","Shorts only");set("o-long","롱폼만","Long only");
+  set("refresh","새로 읽기","Refresh");$("#refresh").title=L("저장된 결과를 건너뛰고 다시 읽습니다. API 한도를 씁니다.","Skip the cache and fetch again. Uses API quota.");
+  set("t-popular","지금 뜨는 영상","Trending now");set("t-categories","카테고리 대결","Category showdown");set("t-trends","검색어 급상승","Rising searches");set("t-topic","주제로 파고들기","Topic deep-dive");
+  set("f-src","데이터 출처: YouTube Data API · Google 트렌드. 구독자 대비 배수와 중앙값은 이 프로그램이 계산한 값이며 YouTube 가 제공한 값이 아닙니다. 이 프로그램은 YouTube, Google 과 관계가 없는 비공식 도구입니다.","Data: YouTube Data API and Google Trends. Subscriber ratios and medians are calculated by this program, not provided by YouTube. This is an unofficial tool, not affiliated with YouTube or Google.");
+  set("f-ig","인스타그램은 공식 API 로 남의 릴스를 읽을 수 없어 이 화면에서 뺐습니다. 캡처로 확인하세요.","Instagram is not included because Reels of other accounts cannot be read through an official API.");
+  const lg=$("#lang");lg.value=KO?"ko":"en";lg.onchange=()=>{localStorage.setItem("lang",lg.value);location.reload()};
+})();
 (async function init(){
+  document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-selected",x.dataset.tab===state.tab));
   const st=await (await fetch("/api/status")).json(); setQuota(st.quotaUsed,st.quotaLimit);
   const sel=$("#region");
-  for(const [k,v] of Object.entries(st.regions)) sel.append(el("option",{value:k,text:`${v} (${k})`}));
+  for(const [k,v] of Object.entries(st.regions)) sel.append(el("option",{value:k,text:`${KO?v:(REGION_EN[v]||v)} (${k})`}));
   sel.value=state.region in st.regions?state.region:"KR"; state.region=sel.value;
   sel.onchange=()=>{state.region=sel.value;localStorage.setItem("region",state.region);load(false)};
   $("#refresh").onclick=()=>load(true);
@@ -305,7 +326,7 @@ async function load(refresh){
     document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
     state.tab=b.dataset.tab; load(false);
   });
-  if(!st.hasKey) msg("YOUTUBE_API_KEY 가 없습니다. .env 파일에 키를 넣고 서버를 다시 켜 주세요. 검색어 급상승 탭은 키 없이 볼 수 있습니다.",true);
+  if(!st.hasKey) msg(L("YOUTUBE_API_KEY 가 없습니다. .env 파일에 키를 넣고 서버를 다시 켜 주세요. 검색어 급상승 탭은 키 없이 볼 수 있습니다.","YOUTUBE_API_KEY is missing. Put your key in the .env file and restart the server. The Rising searches tab works without a key."),true);
   else load(false);
 })();
 </script>
