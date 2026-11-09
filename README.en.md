@@ -92,7 +92,7 @@ python3 tests/test_logic.py
 
 ## License
 
-MIT (see LICENSE)
+[PolyForm Noncommercial 1.0.0](LICENSE). Free to use and modify for personal, study, research and non-profit purposes. Commercial use (selling it, bundling it in a paid service, using it for a company's business) is not permitted; contact hi.everframe@gmail.com if you need it. The source is public, but this is not an OSI-approved open source license. v0.1.0 was released under MIT and stays MIT for those who received it; from v0.1.1 these terms apply.
 
 ## Notices
 

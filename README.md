@@ -88,7 +88,7 @@ python3 tests/test_logic.py
 
 ## 라이선스
 
-MIT (LICENSE 참고)
+[PolyForm Noncommercial 1.0.0](LICENSE). 개인, 학습, 연구, 비영리 목적으로 자유롭게 쓰고 고칠 수 있습니다. 상업적 이용(판매, 유료 서비스에 포함, 회사 영업 목적 사용)은 허용되지 않으며, 필요하면 hi.everframe@gmail.com 으로 문의해 주세요. 소스가 공개되어 있지만 OSI 기준의 오픈소스 라이선스는 아닙니다. v0.1.0 은 MIT 로 배포되었고, 그 판을 받은 사람에게는 MIT 가 계속 적용됩니다. v0.1.1 부터 이 조건입니다.
 
 ## 안내
 
