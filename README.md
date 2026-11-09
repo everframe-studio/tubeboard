@@ -2,6 +2,8 @@
 
 [English](README.en.md) · 한국어
 
+**[데모 화면 열어 보기](https://everframe-studio.github.io/tubeboard/)** (한국 지역 스냅샷, 실시간 아님)
+
 ![TubeBoard 화면: 카테고리 대결](docs/screenshot.png)
 
 유튜브와 구글에서 요즘 뭐가 뜨는지 **웹 화면 하나**로 보는 작은 프로그램입니다. 터미널 출력을 읽을 필요 없이 브라우저에서 지역과 기간을 바꿔 가며 확인합니다.
@@ -16,24 +18,32 @@
 
 인스타그램은 공식 API 로 남의 릴스를 읽을 수 없어 넣지 않았습니다.
 
-## 설치
+## 가장 쉬운 방법: 더블클릭 실행
+
+1. [릴리스 페이지](https://github.com/everframe-studio/tubeboard/releases)에서 본인 운영체제용 압축 파일(`tubeboard-windows.zip` 또는 `tubeboard-mac.zip`)을 받아 풉니다.
+2. `tubeboard`(윈도우는 `tubeboard.exe`)를 실행합니다. 검은 창이 뜨고 브라우저가 저절로 열립니다.
+3. 처음 한 번, 화면에 나오는 입력칸에 본인 YouTube API 키를 붙여넣습니다(아래 「YouTube API 키 발급」). 키는 이 컴퓨터에만 저장됩니다.
+4. 끝낼 때는 검은 창을 닫습니다.
+
+파이썬 설치가 필요 없습니다. 서명되지 않은 프로그램이라 처음 실행할 때 경고가 뜹니다. 윈도우는 「추가 정보 → 실행」, 맥은 파일을 우클릭해 「열기」를 누릅니다. 믿기 어려우면 아래처럼 소스로 실행하세요. 코드는 전부 이 저장소에 있습니다.
+
+## 설치 (소스로 실행)
 
 Python 3.9 이상만 있으면 됩니다. 외부 패키지는 필요 없습니다.
 
 ```bash
 git clone https://github.com/everframe-studio/tubeboard.git
 cd tubeboard
-cp .env.example .env     # 열어서 YOUTUBE_API_KEY= 뒤에 본인 키를 붙여 넣습니다
-python3 -m tubeboard
+python3 -m tubeboard     # 브라우저가 열리고, 키는 화면에서 넣습니다 (.env 에 직접 적어도 됩니다)
 ```
 
-브라우저에서 http://127.0.0.1:8765 를 엽니다. 화면 오른쪽 위의 언어 선택(한국어 / English)으로 바꿀 수 있습니다. 처음에는 브라우저 언어를 따릅니다. 포트는 `.env` 의 `TREND_PORT` 로 바꿉니다. 이미 다른 프로그램이 8765 를 쓰고 있으면 시작할 때 오류가 나니 다른 번호를 넣으세요.
+브라우저가 저절로 열립니다. 안 열리면 터미널에 나온 주소(기본 http://127.0.0.1:8765)를 엽니다. 8765 를 다른 프로그램이 쓰고 있으면 빈 번호를 자동으로 찾습니다. 화면 오른쪽 위의 언어 선택(한국어 / English)으로 바꿀 수 있습니다. 처음에는 브라우저 언어를 따릅니다. 포트는 `.env` 의 `TREND_PORT` 로 바꿉니다. 이미 다른 프로그램이 8765 를 쓰고 있으면 시작할 때 오류가 나니 다른 번호를 넣으세요.
 
 ## YouTube API 키 발급
 
 1. https://console.cloud.google.com 에서 프로젝트를 만듭니다.
 2. 「API 및 서비스 → 라이브러리」에서 **YouTube Data API v3** 를 사용 설정합니다.
-3. 「사용자 인증 정보 → 사용자 인증 정보 만들기 → API 키」를 만들고, 복사해 `.env` 에 넣습니다.
+3. 「사용자 인증 정보 → 사용자 인증 정보 만들기 → API 키」를 만들고, 복사해 화면의 입력칸에 붙여넣습니다 (`.env` 에 `YOUTUBE_API_KEY=` 로 적어도 됩니다).
 4. 키는 본인만 보관하고 git 에 올리지 않습니다 (`.env` 는 `.gitignore` 에 들어 있습니다).
 
 공개 데이터만 읽으므로 OAuth 로그인은 필요 없습니다.
@@ -56,6 +66,7 @@ tubeboard/
   logic.py     순수 함수 (길이 해석, 구독자 배수, 작은 채널 선별, 구글 RSS 해석)
   youtube.py   YouTube Data API 호출 (API 키)
   cache.py     디스크 캐시와 하루 사용량 추정
+  paths.py     설정·캐시 폴더 (실행 파일판은 사용자 폴더)
   server.py    표준 라이브러리 HTTP 서버 (127.0.0.1 에서만 접속 가능)
   static/index.html   화면 한 장
 tests/test_logic.py   python3 tests/test_logic.py

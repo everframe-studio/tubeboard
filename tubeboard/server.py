@@ -2,7 +2,9 @@
 import json
 import os
 import sys
+import threading
 import time
+import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -63,6 +65,24 @@ class Handler(BaseHTTPRequestHandler):
     def _json(self, code, obj):
         self._send(code, json.dumps(obj, ensure_ascii=False).encode("utf-8"), "application/json; charset=utf-8")
 
+    def do_POST(self):
+        host = (self.headers.get("Host") or "").split(":")[0]
+        origin = self.headers.get("Origin")
+        ok_origin = origin is None or urlparse(origin).hostname in ("127.0.0.1", "localhost", "::1")
+        if host not in ("127.0.0.1", "localhost", "[::1]") or not ok_origin:
+            return self._json(403, {"error": "로컬에서만 접근할 수 있습니다."})
+        if urlparse(self.path).path != "/api/key" or "application/json" not in (self.headers.get("Content-Type") or ""):
+            return self._json(404, {"error": "없는 주소입니다."})
+        try:
+            n = min(int(self.headers.get("Content-Length") or 0), 2048)
+            body = json.loads(self.rfile.read(n).decode("utf-8"))
+            youtube.save_key(body.get("key") if isinstance(body, dict) else None)
+            self._json(200, {"ok": True})
+        except youtube.ApiError as e:
+            self._json(400, {"error": str(e)})
+        except (ValueError, UnicodeDecodeError):
+            self._json(400, {"error": "요청 형식이 올바르지 않습니다."})
+
     def do_GET(self):
         host = (self.headers.get("Host") or "").split(":")[0]
         if host not in ("127.0.0.1", "localhost", "[::1]"):  # DNS 리바인딩 방지
@@ -102,11 +122,25 @@ class Handler(BaseHTTPRequestHandler):
             self._json(500, {"error": f"예상하지 못한 오류: {e}"})
 
 
+def bind(port, fixed):
+    """정해 준 포트가 없으면 쓸 수 있는 번호를 찾는다 (더블클릭 실행에서 이미 쓰는 포트 때문에 멈추지 않게)."""
+    last = None
+    for p in ([port] if fixed else range(port, port + 30)):
+        try:
+            return ThreadingHTTPServer(("127.0.0.1", p), Handler), p
+        except OSError as e:
+            last = e
+    raise SystemExit(f"포트를 열 수 없습니다: {last}")
+
+
 def main():
     youtube.load_env()
-    port = int(os.environ.get("TREND_PORT", "8765"))
-    server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    print(f"tubeboard: http://127.0.0.1:{port}  (끝내려면 Ctrl+C)")
+    fixed = "TREND_PORT" in os.environ
+    server, port = bind(int(os.environ.get("TREND_PORT", "8765")), fixed)
+    url = f"http://127.0.0.1:{port}"
+    print(f"tubeboard: {url}  (끝내려면 이 창을 닫거나 Ctrl+C)")
+    if os.environ.get("TREND_NO_BROWSER") != "1":
+        threading.Timer(0.6, lambda: webbrowser.open(url)).start()
     try:
         server.serve_forever()
     except KeyboardInterrupt:

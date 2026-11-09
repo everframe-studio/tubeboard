@@ -46,6 +46,11 @@ h2{font-size:28px;line-height:1.25;margin:56px 0 4px;letter-spacing:-.03em;font-
 .lead{margin:0 0 4px;color:var(--ink2);font-size:17px}
 .msg{padding:16px 20px;border-radius:14px;background:var(--panel);margin:0 0 24px;font-size:17px;border:2px solid var(--rule)}
 .msg.err{border-color:var(--hot)}
+.keybox p{margin:0 0 12px}
+.keyrow{display:flex;gap:10px;flex-wrap:wrap}
+.keyrow input{flex:1 1 280px;min-width:0;padding:10px 12px;font:inherit;border-radius:10px;border:2px solid var(--rule);background:var(--bg);color:var(--ink)}
+.keyrow button{padding:10px 18px;font:inherit;font-weight:600;border-radius:10px;border:2px solid var(--rule);background:var(--panel);color:var(--ink);cursor:pointer}
+.keyout{margin:10px 0 0;min-height:1.4em}
 .asof{margin:14px 0 0;font-size:16px;color:var(--ink2)}
 
 /* 맨 위 한 장: 지금 1위 */
@@ -164,7 +169,7 @@ const L = (ko, en) => KO ? ko : en;
 const LOC = KO ? "ko-KR" : "en-US";
 const CAT_EN = {"엔터":"Entertainment","코미디":"Comedy","영화·애니":"Film & Animation","스포츠":"Sports","동물":"Pets & Animals","노하우·스타일":"Howto & Style","자동차":"Autos","음악":"Music","과학·기술":"Science & Tech","뉴스":"News","인물·블로그":"People & Blogs","게임":"Gaming","여행":"Travel","교육":"Education"};
 const REGION_EN = {"한국":"South Korea","미국":"United States","일본":"Japan","영국":"United Kingdom","독일":"Germany","프랑스":"France","브라질":"Brazil","인도":"India","인도네시아":"Indonesia","대만":"Taiwan","베트남":"Vietnam","태국":"Thailand"};
-const ERR_EN = [["YOUTUBE_API_KEY 가 없습니다","YOUTUBE_API_KEY is missing. Put your key in the .env file (see README)."],["유튜브 하루 한도가 찼습니다","The daily YouTube API quota is used up. It resets at midnight Pacific time."],["유튜브 API 오류","YouTube API error: "],["네트워크 오류","Network error: "],["구글 트렌드를 읽지","Could not read Google Trends. Try again shortly."],["주제를 입력해","Enter a topic."],["로컬에서만","Local access only."],["예상하지 못한 오류","Unexpected error: "]];
+const ERR_EN = [["YOUTUBE_API_KEY 가 없습니다","YOUTUBE_API_KEY is missing. Enter your key on screen or put it in the .env file (see README)."],["키 형식이 올바르지 않습니다","That key does not look right. Paste the API key from Google Cloud as it is."],["키가 맞지 않거나","The key is wrong, or YouTube Data API v3 is not enabled. Check the key steps in the README."],["요청 형식이","Invalid request."],["유튜브 하루 한도가 찼습니다","The daily YouTube API quota is used up. It resets at midnight Pacific time."],["유튜브 API 오류","YouTube API error: "],["네트워크 오류","Network error: "],["구글 트렌드를 읽지","Could not read Google Trends. Try again shortly."],["주제를 입력해","Enter a topic."],["로컬에서만","Local access only."],["예상하지 못한 오류","Unexpected error: "]];
 const tr = m => { if (KO) return m; for (const [k, v] of ERR_EN) if (m.includes(k)) return v.endsWith(": ") ? v + m.split(/[:：] ?/).slice(1).join(": ") : v; return m; };
 const cn = x => KO ? x : (CAT_EN[x] || x);
 const state = {catKey: "median", kind: "all", tab: ["popular","categories","trends","topic"].includes(QS.get("tab"))?QS.get("tab"):"popular", region: localStorage.getItem("region") || "KR", days: 7, topic: ""};
@@ -303,6 +308,24 @@ async function load(refresh){
   }catch(e){ msg(e.message,true); }
 }
 
+function keyForm(){
+  const d=$("#notice");d.replaceChildren();
+  const inp=el("input",{type:"password",id:"keyin",autocomplete:"off",spellcheck:"false",placeholder:"AIza..."});
+  const btn=el("button",{type:"button",text:L("저장하고 시작","Save and start")});
+  const out=el("p",{class:"keyout",role:"status"});
+  const go=async()=>{
+    btn.disabled=true;out.textContent=L("확인하는 중…","Checking…");
+    try{
+      const r=await fetch("/api/key",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:inp.value})});
+      const j=await r.json(); if(!r.ok) throw new Error(j.error||"error");
+      location.reload();
+    }catch(e){out.textContent=tr(e.message);btn.disabled=false}
+  };
+  btn.onclick=go; inp.onkeydown=e=>{if(e.key==="Enter")go()};
+  d.append(el("div",{class:"msg keybox"},
+    el("p",{text:L("처음 한 번만 YouTube API 키를 넣으면 됩니다. 키는 이 컴퓨터에만 저장되고 다른 곳으로 보내지 않습니다. 키 만드는 법은 README 의 안내를 따라 주세요. 검색어 급상승 탭은 키 없이 볼 수 있습니다.","Enter your YouTube API key once. It is stored only on this computer and never sent anywhere else. See the README for how to create one. The Rising searches tab works without a key.")}),
+    el("div",{class:"keyrow"},inp,btn),out));
+}
 (function applyLang(){
   document.documentElement.lang=KO?"ko":"en";
   const set=(id,ko,en)=>{const e=document.getElementById(id);if(e)e.textContent=L(ko,en)};
@@ -326,7 +349,7 @@ async function load(refresh){
     document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
     state.tab=b.dataset.tab; load(false);
   });
-  if(!st.hasKey) msg(L("YOUTUBE_API_KEY 가 없습니다. .env 파일에 키를 넣고 서버를 다시 켜 주세요. 검색어 급상승 탭은 키 없이 볼 수 있습니다.","YOUTUBE_API_KEY is missing. Put your key in the .env file and restart the server. The Rising searches tab works without a key."),true);
+  if(!st.hasKey) keyForm();
   else load(false);
 })();
 </script>

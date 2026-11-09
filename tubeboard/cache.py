@@ -5,12 +5,14 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+from .paths import data_dir
+
 try:
     from zoneinfo import ZoneInfo
 except ImportError:  # pragma: no cover
     ZoneInfo = None
 
-CACHE_DIR = Path(__file__).resolve().parent.parent / ".cache"
+CACHE_DIR = data_dir() / ".cache"
 
 
 def _read(path):

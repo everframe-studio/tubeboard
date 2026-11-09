@@ -2,6 +2,8 @@
 
 English · [한국어](README.md)
 
+**[Open the demo](https://everframe-studio.github.io/tubeboard/)** (a snapshot of Korea, not live)
+
 ![TubeBoard: category showdown](docs/screenshot.png)
 
 A small local program that shows what is trending on YouTube and Google in **one web page**. Pick a region and a period in the browser instead of reading terminal output.
@@ -18,18 +20,26 @@ Instagram is not included because Reels of other accounts cannot be read through
 
 The interface is available in Korean and English. Use the language selector at the top right; the first load follows your browser language.
 
-## Install
+## Easiest: double-click build
+
+1. From the [Releases page](https://github.com/everframe-studio/tubeboard/releases), download the zip for your system (`tubeboard-windows.zip` or `tubeboard-mac.zip`) and unzip it.
+2. Run `tubeboard` (`tubeboard.exe` on Windows). A console window opens and your browser opens by itself.
+3. Once, paste your own YouTube API key into the box on screen (see "Get a YouTube API key" below). The key is stored only on this computer.
+4. Close the console window to quit.
+
+No Python needed. The program is not code-signed, so your system warns the first time. On Windows choose "More info → Run anyway"; on macOS right-click the file and choose "Open". If you would rather not trust a binary, run from source as below. All the code is in this repository.
+
+## Install (run from source)
 
 You only need Python 3.9 or later. No external packages.
 
 ```bash
 git clone https://github.com/everframe-studio/tubeboard.git
 cd tubeboard
-cp .env.example .env     # open it and paste your own key after YOUTUBE_API_KEY=
-python3 -m tubeboard
+python3 -m tubeboard     # your browser opens; enter the key on screen (or put it in .env)
 ```
 
-Open http://127.0.0.1:8765 in a browser. Change the port with `TREND_PORT` in `.env`. If another program already uses 8765, startup fails with an error, so pick another number.
+Your browser opens by itself. If not, open the address printed in the terminal (default http://127.0.0.1:8765). If another program uses 8765, a free port is found automatically. Change the port with `TREND_PORT` in `.env`.
 
 Tested on macOS only. On Windows the command may be `python` or `py -m tubeboard`. [unverified]
 
@@ -37,7 +47,7 @@ Tested on macOS only. On Windows the command may be `python` or `py -m tubeboard
 
 1. Create a project at https://console.cloud.google.com.
 2. In "APIs & Services → Library", enable **YouTube Data API v3**.
-3. Under "Credentials → Create credentials → API key", create a key and paste it into `.env`.
+3. Under "Credentials → Create credentials → API key", create a key and paste it into the box on screen (or write `YOUTUBE_API_KEY=` in `.env`).
 4. Keep the key to yourself and never commit it (`.env` is in `.gitignore`).
 
 Only public data is read, so no OAuth sign-in is needed.
@@ -60,6 +70,7 @@ tubeboard/
   logic.py     pure functions (duration parsing, subscriber ratio, small-channel selection, Google RSS parsing)
   youtube.py   YouTube Data API calls (API key)
   cache.py     disk cache and daily usage estimate
+  paths.py     where settings and cache live (user folder in the binary build)
   server.py    standard-library HTTP server (reachable from 127.0.0.1 only)
   static/index.html   the single page
 tests/test_logic.py   python3 tests/test_logic.py

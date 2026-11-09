@@ -1,0 +1,52 @@
+name: release
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            name: tubeboard-windows
+            sep: ";"
+          - os: macos-latest
+            name: tubeboard-mac
+            sep: ":"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyinstaller
+      - name: Build
+        shell: bash
+        run: pyinstaller --onefile --name tubeboard --add-data "tubeboard/static${{ matrix.sep }}tubeboard/static" run_tubeboard.py
+      - name: Zip
+        shell: bash
+        run: |
+          mkdir out
+          cp dist/tubeboard* out/
+          cp README.md README.en.md LICENSE out/
+          cd out && python -c "import shutil; shutil.make_archive('../${{ matrix.name }}', 'zip', '.')"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: ${{ matrix.name }}.zip
+  publish:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" *.zip --repo "${{ github.repository }}" --title "${{ github.ref_name }}" --notes "Double-click build. Unzip and run tubeboard (Windows: tubeboard.exe). Your browser opens; paste your own YouTube API key once. 더블클릭 실행판입니다. 압축을 풀고 실행하면 브라우저가 열리고, 처음 한 번 본인 YouTube API 키를 붙여넣으면 됩니다."

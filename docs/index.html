@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>튜브보드</title>
+<style>
+@font-face{font-family:"Pretendard Variable";font-style:normal;font-display:swap;font-weight:45 920;src:url(fonts/PretendardVariable.woff2) format("woff2")}
+:root{
+  --bg:#f4f2ff; --panel:#ffffff; --ink:#16142c; --ink2:#5a5879; --rule:#dcd8f2; --track:#ebe8fb;
+  --pop:#e11d2e; --hot:#ff7a2f; --cl:50%; --on-pop:#fff;
+  --font:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b0d1a; --panel:#141830; --ink:#f4f5ff; --ink2:#a9aed0; --rule:#272c52; --track:#1d2244;
+  --pop:#ff4d57; --hot:#ff9a4d; --cl:64%; --on-pop:#1a0507}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.55 var(--font)}
+.wrap{max-width:none;margin:0 auto;padding:0 40px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--pop);outline-offset:2px}
+
+/* 상단 */
+.mast .wrap{display:flex;align-items:center;gap:24px;padding-top:22px;padding-bottom:6px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-size:28px;font-weight:900;letter-spacing:-.04em;margin:0}.brand svg{width:44px;height:31px;flex:none}
+.tools{display:flex;align-items:center;gap:12px;margin-left:auto;flex-wrap:wrap}
+.tools label{display:flex;align-items:center;gap:8px;color:var(--ink2);font-size:16px}
+select,input[type=text]{font:inherit;font-size:17px;color:var(--ink);background:var(--panel);border:2px solid var(--rule);border-radius:12px;padding:8px 14px;min-height:46px}
+button{font:inherit;font-size:17px;color:var(--ink);background:var(--panel);border:2px solid var(--rule);border-radius:12px;padding:8px 18px;min-height:46px;cursor:pointer;font-weight:600}
+button:hover{border-color:var(--pop)}
+button.primary{background:var(--pop);border-color:var(--pop);color:var(--on-pop);font-weight:800}
+.quota{min-width:200px;font-size:16px;color:var(--ink2)}
+.quota b{color:var(--ink)}
+.quota i{display:block;height:5px;background:var(--track);margin-top:5px;border-radius:3px;overflow:hidden}
+.quota i span{display:block;height:100%;background:linear-gradient(90deg,var(--pop),var(--hot))}
+
+/* 탭 */
+.tabs .wrap{display:flex;gap:8px;padding-top:14px;padding-bottom:4px;overflow-x:auto}
+.tabs button{border:0;border-radius:12px;background:transparent;padding:10px 20px;font-size:20px;font-weight:700;color:var(--ink2);white-space:nowrap}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected=true]{background:var(--ink);color:var(--bg)}
+
+main{padding:22px 0 90px}
+h2{font-size:28px;line-height:1.25;margin:56px 0 4px;letter-spacing:-.03em;font-weight:900}
+.lead{margin:0 0 4px;color:var(--ink2);font-size:17px}
+.msg{padding:16px 20px;border-radius:14px;background:var(--panel);margin:0 0 24px;font-size:17px;border:2px solid var(--rule)}
+.msg.err{border-color:var(--hot)}
+.keybox p{margin:0 0 12px}
+.keyrow{display:flex;gap:10px;flex-wrap:wrap}
+.keyrow input{flex:1 1 280px;min-width:0;padding:10px 12px;font:inherit;border-radius:10px;border:2px solid var(--rule);background:var(--bg);color:var(--ink)}
+.keyrow button{padding:10px 18px;font:inherit;font-weight:600;border-radius:10px;border:2px solid var(--rule);background:var(--panel);color:var(--ink);cursor:pointer}
+.keyout{margin:10px 0 0;min-height:1.4em}
+.asof{margin:14px 0 0;font-size:16px;color:var(--ink2)}
+
+/* 맨 위 한 장: 지금 1위 */
+.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:36px;align-items:center;margin-top:10px}
+.hero .big{position:relative;display:block;border-radius:20px;overflow:hidden;background:var(--track);text-decoration:none}
+.hero .big img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.hero .big .tag{position:absolute;left:0;top:0;background:var(--hot);color:#fff;font-weight:900;font-size:22px;padding:10px 18px;border-bottom-right-radius:16px}
+.hero .big .cap{position:absolute;left:0;right:0;bottom:0;padding:60px 22px 18px;background:linear-gradient(transparent,rgba(5,6,20,.88));color:#fff}
+.hero .big .cap b{display:block;font-size:26px;line-height:1.3;letter-spacing:-.02em;font-weight:800}
+.hero .big .cap span{font-size:18px;opacity:.9}
+.hero h3{word-break:keep-all;margin:0 0 18px;font-size:44px;line-height:1.18;letter-spacing:-.04em;font-weight:900}
+.hero h3 em{font-style:normal;color:var(--hot)}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fact{background:var(--panel);border-radius:16px;padding:14px 18px}
+.fact dt{font-size:16px;color:var(--ink2);margin:0}
+.fact dd{margin:0;font-size:40px;font-weight:900;letter-spacing:-.04em;line-height:1.15}
+.fact dd small{font-size:18px;font-weight:700;color:var(--ink2);margin-left:3px;letter-spacing:0}
+
+/* 가로 한 줄 영상 목록 */
+.rowhead{display:flex;align-items:flex-end;gap:16px;margin:50px 0 16px}
+.rowhead h2{margin:0}
+.rowhead .nav{margin-left:auto;display:flex;gap:8px}
+.rowhead .nav button{width:48px;padding:0;font-size:20px}
+.strip{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x proximity;padding:0 0 14px;scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+.vcard{flex:0 0 400px;text-decoration:none;scroll-snap-align:start;display:block}
+.vcard .th{position:relative;border-radius:16px;overflow:hidden;background:var(--track)}
+.vcard img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;transition:transform .25s}
+.vcard:hover img{transform:scale(1.04)}
+.vcard .rk{position:absolute;left:0;top:0;background:var(--pop);color:var(--on-pop);font-weight:900;font-size:22px;line-height:1;padding:9px 14px;border-bottom-right-radius:14px}
+.vcard .kind{position:absolute;right:8px;bottom:8px;background:rgba(5,6,20,.82);color:#fff;font-size:16px;font-weight:700;line-height:1;padding:6px 9px;border-radius:6px}
+.vcard .kind.short{background:var(--hot)}
+.vcard .boom{position:absolute;left:0;bottom:0;background:var(--hot);color:#fff;font-weight:900;font-size:22px;line-height:1;padding:10px 14px;border-top-right-radius:14px}
+.vcard b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:19px;line-height:1.4;min-height:2.8em;margin-top:12px;font-weight:700}
+.vcard:hover b{text-decoration:underline}
+.vcard .ch{color:var(--ink2);font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vcard .st{margin-top:6px;font-size:18px;display:flex;justify-content:space-between;gap:10px;font-weight:700}
+.vcard .st span:last-child{color:var(--ink2);font-weight:500;font-size:16px}
+
+/* 카테고리 순위판 */
+.sortbar{display:flex;gap:8px;margin:12px 0 18px;flex-wrap:wrap}
+.sortbar button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.board{background:var(--panel);border-radius:20px;padding:8px 8px;max-width:1240px}
+.chead,.crow{display:grid;grid-template-columns:44px minmax(150px,max-content) minmax(160px,1fr) 64px minmax(0,1.1fr);gap:0 16px;align-items:center;padding:0 16px 0 8px}
+.chead{font-size:16px;color:var(--ink2);padding-top:10px;padding-bottom:8px}
+.chead span:nth-child(1){text-align:center}
+.crow{padding-top:7px;padding-bottom:7px;cursor:pointer;text-decoration:none;color:inherit;border-radius:12px}
+.crow:hover{background:var(--track)}
+.crow .no{font-size:24px;font-weight:900;text-align:center;color:var(--ink2)}
+.crow.top .no{color:var(--hot)}
+.crow .nm{min-width:230px;font-size:22px;font-weight:800;letter-spacing:-.02em;white-space:nowrap}
+.crow .nm::before{content:"";display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--c);margin-right:9px}
+.crow .meter{display:grid;grid-template-columns:1fr 88px;gap:10px;align-items:center}
+.crow .meter .trk{height:24px;background:var(--track);border-radius:6px;overflow:hidden}
+.crow .meter i{display:block;height:100%;background:var(--c);border-radius:6px}
+.crow .meter strong{font-size:22px;font-weight:900;text-align:right;white-space:nowrap}
+.crow .cnt{font-size:17px;color:var(--ink2);text-align:right}
+.crow .tv{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink2)}
+.crow.thin{opacity:.55}
+@media (max-width:900px){.chead{display:none}.crow{grid-template-columns:36px 1fr 64px;row-gap:4px}.crow .meter{grid-column:2/-1}.crow .tv{grid-column:2/-1}}
+
+/* 구글 급상승 검색어 */
+.kw{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:12px 20px;margin-top:14px}
+.kw a{display:grid;grid-template-columns:54px 1fr auto;gap:8px 14px;align-items:center;background:var(--panel);border-radius:16px;padding:12px 18px;text-decoration:none}
+.kw a:hover{outline:2px solid var(--pop)}
+.kw .n{font-size:30px;font-weight:900;color:var(--ink2);text-align:center}
+.kw a:nth-child(-n+3) .n{color:var(--hot)}
+.kw .q{font-size:22px;font-weight:800;letter-spacing:-.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kw .t{font-size:17px;font-weight:700;color:var(--ink2)}
+.kw .bar{grid-column:2/-1;height:6px;background:var(--track);border-radius:3px;overflow:hidden}
+.kw .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pop),var(--hot))}
+
+/* 주제 입력 */
+.ask{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:6px 0 10px}
+.ask input{flex:1 1 280px;max-width:480px;font-size:20px;font-weight:600}
+.sr{position:absolute;left:-9999px}
+.foot{margin-top:60px;color:var(--ink2);font-size:16px}
+
+@media (max-width:980px){.hero{grid-template-columns:1fr}.hero h3{font-size:34px}}
+@media (max-width:760px){
+  .wrap{padding:0 16px}
+  .tools{margin-left:0;width:100%}
+  .vcard{flex-basis:290px}
+  .kw{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.vcard img{transition:none}}
+</style>
+</head>
+<body>
+<header class="mast"><div class="wrap">
+  <h1 class="brand"><svg viewBox="0 0 44 31" aria-hidden="true"><rect width="44" height="31" rx="9" fill="var(--pop)"/><path d="M18 9.5v12l10.5-6z" fill="#fff"/></svg><span id="brand-name">튜브보드</span></h1>
+  <div class="tools">
+    <label for="kind"><span id="l-kind">형식</span> <select id="kind"><option value="all" id="o-all">쇼츠+롱폼</option><option value="short" id="o-short">쇼츠만</option><option value="long" id="o-long">롱폼만</option></select></label>
+    <label for="region"><span id="l-region">지역</span> <select id="region"></select></label>
+    <label for="lang"><span class="sr">Language</span> <select id="lang"><option value="ko">한국어</option><option value="en">English</option></select></label>
+    <button id="refresh">새로 읽기</button>
+    <div class="quota" id="quota" aria-live="polite"></div>
+  </div>
+</div></header>
+<div class="tabs"><div class="wrap" role="tablist" id="tabs">
+  <button role="tab" data-tab="popular" aria-selected="true" id="t-popular">지금 뜨는 영상</button>
+  <button role="tab" data-tab="categories" aria-selected="false" id="t-categories">카테고리 대결</button>
+  <button role="tab" data-tab="trends" aria-selected="false" id="t-trends">검색어 급상승</button>
+  <button role="tab" data-tab="topic" aria-selected="false" id="t-topic">주제로 파고들기</button>
+</div></div>
+<main><div class="wrap">
+  <div id="notice"></div>
+  <div id="view"></div>
+  <p class="foot"><span id="f-src"></span> <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube Terms of Service</a> · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a></p>
+  <p class="foot" id="f-ig"></p>
+</div></main>
+<script>
+/* 데모: 서버 대신 docs/data.json(한국 스냅샷 2026-11-09)을 돌려 준다 */
+(function(){
+  const KOL=(new URLSearchParams(location.search).get("lang")||localStorage.getItem("lang")||navigator.language||"ko").toLowerCase().startsWith("ko");
+  const realFetch=window.fetch.bind(window);
+  let snap=null; const load=()=>snap||(snap=realFetch("data.json").then(r=>r.json()));
+  const json=(o,code)=>new Response(JSON.stringify(o),{status:code||200,headers:{"Content-Type":"application/json"}});
+  window.fetch=async function(u,o){
+    const url=new URL(typeof u==="string"?u:u.url,location.href);
+    if(!url.pathname.startsWith("/api/")) return realFetch(u,o);
+    const d=await load(), p=url.pathname;
+    if(p==="/api/status") return json({hasKey:true,quotaUsed:0,quotaLimit:10000,regions:{KR:"한국"}});
+    const map={"/api/popular":"popular","/api/categories":"categories","/api/trends":"trends"};
+    if(map[p]) return json({data:d[map[p]],cached:true,at:d.at,quotaUsed:0,quotaLimit:10000});
+    return json({error:KOL?"데모에서는 쓸 수 없습니다. 내려받아 본인 키로 실행하면 됩니다.":"Not available in the demo. Download it and run with your own key."},400);
+  };
+  document.addEventListener("DOMContentLoaded",()=>{
+    const b=document.createElement("div");
+    b.style.cssText="padding:12px 16px;margin:0;background:#16142c;color:#fff;font:15px/1.5 system-ui,sans-serif;text-align:center";
+    const a=(h,t)=>'<a style="color:#ffd9ec;font-weight:600" href="'+h+'">'+t+'</a>';
+    b.innerHTML=KOL
+      ? "데모 화면입니다. 한국 지역의 2026-11-09 스냅샷이고 실시간이 아닙니다. 지금 데이터를 보려면 "+a("https://github.com/everframe-studio/tubeboard/releases","내려받아")+" 본인 키로 실행하세요."
+      : "Demo: a snapshot of Korea taken on 2026-11-09, not live. To see current data, "+a("https://github.com/everframe-studio/tubeboard/releases","download it")+" and run it with your own key.";
+    document.body.prepend(b);
+  });
+})();
+</script>
+<script>
+const $ = s => document.querySelector(s);
+const QS = new URLSearchParams(location.search);
+const KO = (QS.get("lang") || localStorage.getItem("lang") || navigator.language || "ko").toLowerCase().startsWith("ko");
+const L = (ko, en) => KO ? ko : en;
+const LOC = KO ? "ko-KR" : "en-US";
+const CAT_EN = {"엔터":"Entertainment","코미디":"Comedy","영화·애니":"Film & Animation","스포츠":"Sports","동물":"Pets & Animals","노하우·스타일":"Howto & Style","자동차":"Autos","음악":"Music","과학·기술":"Science & Tech","뉴스":"News","인물·블로그":"People & Blogs","게임":"Gaming","여행":"Travel","교육":"Education"};
+const REGION_EN = {"한국":"South Korea","미국":"United States","일본":"Japan","영국":"United Kingdom","독일":"Germany","프랑스":"France","브라질":"Brazil","인도":"India","인도네시아":"Indonesia","대만":"Taiwan","베트남":"Vietnam","태국":"Thailand"};
+const ERR_EN = [["YOUTUBE_API_KEY 가 없습니다","YOUTUBE_API_KEY is missing. Enter your key on screen or put it in the .env file (see README)."],["키 형식이 올바르지 않습니다","That key does not look right. Paste the API key from Google Cloud as it is."],["키가 맞지 않거나","The key is wrong, or YouTube Data API v3 is not enabled. Check the key steps in the README."],["요청 형식이","Invalid request."],["유튜브 하루 한도가 찼습니다","The daily YouTube API quota is used up. It resets at midnight Pacific time."],["유튜브 API 오류","YouTube API error: "],["네트워크 오류","Network error: "],["구글 트렌드를 읽지","Could not read Google Trends. Try again shortly."],["주제를 입력해","Enter a topic."],["로컬에서만","Local access only."],["예상하지 못한 오류","Unexpected error: "]];
+const tr = m => { if (KO) return m; for (const [k, v] of ERR_EN) if (m.includes(k)) return v.endsWith(": ") ? v + m.split(/[:：] ?/).slice(1).join(": ") : v; return m; };
+const cn = x => KO ? x : (CAT_EN[x] || x);
+const state = {catKey: "median", kind: "all", tab: ["popular","categories","trends","topic"].includes(QS.get("tab"))?QS.get("tab"):"popular", region: localStorage.getItem("region") || "KR", days: 7, topic: ""};
+const n = x => x == null ? "–" : x.toLocaleString(LOC);
+function el(tag, attrs, ...kids){const e=document.createElement(tag);for(const[k,v]of Object.entries(attrs||{})){if(k==="class")e.className=v;else if(k==="text")e.textContent=v;else e.setAttribute(k,v)}for(const c of kids)e.append(c);return e}
+function msg(text, err){const d=$("#notice");d.replaceChildren();if(text)d.append(el("p",{class:"msg"+(err?" err":""),role:err?"alert":"status",text:err?tr(text):text}))}
+const compact = x => KO ? (x>=1e8?(x/1e8).toFixed(1)+"억":x>=1e4?(x/1e4).toFixed(x>=1e6?0:1)+"만":n(x)) : (x>=1e9?(x/1e9).toFixed(1)+"B":x>=1e6?(x/1e6).toFixed(x>=1e7?0:1)+"M":x>=1e3?(x/1e3).toFixed(x>=1e5?0:1)+"K":n(x));
+function ago(iso){const d=(Date.now()-new Date(iso))/864e5; return d<1?L("오늘","today"):d<30?L(Math.floor(d)+"일 전",Math.floor(d)+"d ago"):L(Math.floor(d/30)+"개월 전",Math.floor(d/30)+"mo ago")}
+const CATS=["엔터","코미디","영화·애니","스포츠","동물","노하우·스타일","자동차","음악","과학·기술","뉴스","인물·블로그","게임","여행","교육"];
+const hue = name => `hsl(${(Math.max(0,CATS.indexOf(name))*47+8)%360} 82% var(--cl))`;
+const dur=t=>t>=3600?Math.floor(t/3600)+":"+String(Math.floor(t%3600/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0"):Math.floor(t/60)+":"+String(t%60).padStart(2,"0");
+
+async function call(path, params, refresh){
+  const q = new URLSearchParams({region: state.region, ...params}); if(refresh) q.set("refresh","1");
+  const r = await fetch(path+"?"+q), j = await r.json();
+  if(!r.ok) throw new Error(j.error || r.statusText);
+  setQuota(j.quotaUsed, j.quotaLimit); return j;
+}
+function setQuota(u,l){
+  const q=$("#quota"); q.replaceChildren(el("span",{},L("오늘 API 사용 ","API used today "),el("b",{text:n(u)})," / "+n(l)),el("i",{},el("span",{style:`width:${Math.min(100,u/l*100)}%`})));
+}
+const stamp = (at,cached)=>{const t=new Date(at*1000).toLocaleTimeString(LOC,{hour:"2-digit",minute:"2-digit"});return KO?(cached?"저장된 결과":"방금 읽음")+", "+t+" 기준":(cached?"Cached result":"Just fetched")+", as of "+t};
+const empty = t => el("p",{class:"msg",text:t});
+
+function facts(items){
+  const dl=el("dl",{class:"facts"});
+  items.forEach(([k,v,u])=>dl.append(el("div",{class:"fact"},el("dt",{text:k}),el("dd",{},String(v),u?el("small",{text:u}):""))));
+  return dl;
+}
+function strip(videos, badge){
+  const row=el("div",{class:"strip"});
+  videos.forEach((v,i)=>{
+    const st=el("div",{class:"st"},el("span",{},L("조회 ","Views ")+n(v.views)),
+      el("span",{}, v.subs==null?L("구독자 비공개","Subscribers hidden"):(L("구독자 ","Subscribers ")+compact(v.subs)), v.ratio!=null&&v.ratio<20?" · "+v.ratio.toLocaleString(LOC)+L("배","x"):""));
+    const th=el("div",{class:"th"},el("img",{src:v.thumb,alt:"",loading:"lazy"}),el("span",{class:"rk",text:badge(v,i)}),
+      el("span",{class:"kind"+(v.seconds<=60?" short":""),text:(v.seconds<=60?L("쇼츠 ","Short "):L("롱폼 ","Long "))+dur(v.seconds)}));
+    if(v.ratio!=null && v.ratio>=20) th.append(el("span",{class:"boom",text:L("구독자의 "+Math.round(v.ratio).toLocaleString(LOC)+"배",Math.round(v.ratio).toLocaleString(LOC)+"x subscribers")}));
+    row.append(el("a",{class:"vcard",href:v.url,target:"_blank",rel:"noopener"},th,el("b",{text:v.title}),el("div",{class:"ch",text:v.channel}),st));
+  });
+  return row;
+}
+function lane(title, lead, videos, badge, emptyText, id){
+  if(state.kind==="short") videos=videos.filter(v=>v.seconds<=60);
+  else if(state.kind==="long") videos=videos.filter(v=>v.seconds>60);
+  if(!videos.length && state.kind!=="all") emptyText=L("선택한 형식의 영상이 없습니다.","No videos of this format.");
+  const f=document.createDocumentFragment(), nav=el("div",{class:"nav"});
+  const row=videos.length?strip(videos,badge):empty(emptyText);
+  if(videos.length){
+    const go=d=>()=>row.scrollBy({left:d*row.clientWidth*0.85,behavior:"smooth"});
+    const l=el("button",{"aria-label":L("왼쪽","Left"),text:"←"}), r=el("button",{"aria-label":L("오른쪽","Right"),text:"→"});
+    l.onclick=go(-1); r.onclick=go(1); nav.append(l,r);
+  }
+  f.append(el("div",{class:"rowhead",id:id||""},el("div",{},el("h2",{text:title}),lead?el("p",{class:"lead",text:lead}):""),nav),row);
+  return f;
+}
+const byNew=vs=>vs.slice().sort((a,b)=>Date.parse(b.published)-Date.parse(a.published));
+const rankBadge=(v,i)=>String(i+1), agoBadge=v=>ago(v.published);
+
+function hero(v, headline, items){
+  const big=el("a",{class:"big",href:v.url,target:"_blank",rel:"noopener"},
+    el("img",{src:v.thumb,alt:""}),el("span",{class:"tag",text:L("지금 1위","No. 1 now")}),
+    el("div",{class:"cap"},el("b",{text:v.title}),el("span",{text:`${v.channel} · ${L("조회 "+n(v.views)+"회",n(v.views)+" views")}`})));
+  return el("div",{class:"hero"},big,el("div",{},headline,items));
+}
+
+async function load(refresh){
+  const view=$("#view"); view.replaceChildren(); msg("");
+  try{
+    if(state.tab==="popular"){
+      msg(L("읽는 중…","Loading…"));
+      const j=await call("/api/popular",{},refresh); msg("");
+      const d=j.data, vs=d.videos;
+      if(!vs.length){view.append(empty(L("인기 급상승 영상이 없습니다.","No trending videos.")));return}
+      const small=vs.filter(v=>v.subs!=null&&v.subs<10000&&v.ratio!=null&&!v.channel.endsWith(" - Topic"));
+      const med=vs.map(v=>v.views).sort((a,b)=>a-b)[Math.floor(vs.length/2)];
+      const [c1,c2]=d.categories, top=vs[0];
+      const h=el("h3",{},L("지금은 ","Right now: "),el("em",{text:cn(c1[0])}),c2?" · ":"",c2?el("em",{text:cn(c2[0])}):"",L(" 천하입니다"," lead"));
+      view.append(hero(top,h,facts([[L("인기 급상승","Trending"),vs.length,L("개","")],[L("조회수 중앙값","Median views"),compact(med),L("회","")],[L("쇼츠","Shorts"),d.shorts,L("개","")],[L("구독자 1만 미만 채널","Channels under 10K subs"),small.length,L("개","")]])));
+      view.append(el("p",{class:"asof",text:stamp(j.at,j.cached)+L(`. 상위 ${vs.length}개 중 ${c1[0]} ${c1[1]}개${c2?", "+c2[0]+" "+c2[1]+"개":""}.`,`. Of the top ${vs.length}: ${cn(c1[0])} ${c1[1]}${c2?", "+cn(c2[0])+" "+c2[1]:""}.`)}));
+      view.append(lane(L("작은 채널에서 터진 영상","Breakouts from small channels"),L("구독자 1만 미만 채널입니다. 구독자 덕이 아니라 영상이 먹힌 경우입니다.","Channels under 10K subscribers. The video worked, not the audience."),small.slice().sort((a,b)=>b.ratio-a.ratio),rankBadge,L("지금 인기 급상승에는 구독자 1만 미만 채널의 영상이 없습니다. 음원 자동 채널(- Topic)은 뺐습니다.","No videos from channels under 10K subscribers right now. Auto-generated \"- Topic\" music channels are excluded.")));
+      view.append(lane(L("전체 순위","Overall ranking"),L("유튜브 인기 급상승 순서 그대로입니다.","In YouTube's trending order."),vs,rankBadge,""));
+      view.append(lane(L("방금 올라온 순","Newest first"),L("같은 목록을 올라온 시각 기준으로 다시 정렬했습니다.","The same list sorted by upload time."),byNew(vs),agoBadge,""));
+    } else if(state.tab==="categories"){
+      msg(L("카테고리별로 읽는 중…","Loading categories…"));
+      const j=await call("/api/categories",{},refresh); msg("");
+      const rows=j.data.rows;
+      const keys={median:[L("조회수 중앙값","Median views"),r=>r.median],total:[L("조회수 합계","Total views"),r=>r.total],top:[L("1위 영상 조회수","Top video views"),r=>Math.max(0,...r.videos.map(v=>v.views))]};
+      const board=el("div",{class:"board"}), bar=el("div",{class:"sortbar",role:"group","aria-label":L("순위 기준","Ranking basis")});
+      function draw(){
+        const [label,f]=keys[state.catKey], sorted=rows.slice().sort((x,y)=>((y.count>=5)-(x.count>=5))||(f(y)-f(x))), mx=Math.max(1,...sorted.filter(r=>r.count>=5).map(f));
+        bar.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===state.catKey));
+        board.replaceChildren(el("div",{class:"chead"},el("span",{text:L("순위","Rank")}),el("span",{text:L("카테고리","Category")}),el("span",{text:label}),el("span",{text:L("영상","Videos"),style:"text-align:right"}),el("span",{text:L("가장 많이 본 영상","Most viewed video")})),...sorted.map((r,i)=>{
+          const tv=r.videos.slice().sort((x,y)=>y.views-x.views)[0], val=f(r), w=Math.max(4,Math.min(100,Math.round(val/mx*100)));
+          const a=el("a",{class:"crow"+(i<3&&r.count>=5?" top":"")+(r.count<5?" thin":""),href:"#cat-"+rows.indexOf(r),title:tv?tv.title:"",style:"--c:"+hue(r.name)},
+            el("div",{class:"no",text:r.count>=5?String(i+1):"–"}),
+            el("div",{class:"nm",text:cn(r.name)}),
+            el("div",{class:"meter"},el("div",{class:"trk"},el("i",{style:`width:${w}%`})),el("strong",{text:compact(val)})),
+            el("div",{class:"cnt",text:r.count+L("개","")}),
+            el("div",{class:"tv",text:tv?tv.title:""}));
+          a.onclick=e=>{e.preventDefault();const t=document.getElementById("cat-"+rows.indexOf(r));if(t)t.scrollIntoView({behavior:"smooth",block:"start"})};
+          return a;
+        }));
+        $("#catlead").textContent=L("막대는 「"+label+"」 기준입니다. 줄을 누르면 아래에서 그 카테고리의 영상을 봅니다.","Bars show \""+label+"\". Click a row to see that category's videos below.");
+      }
+      Object.entries(keys).forEach(([k,[t]])=>{const b=el("button",{"data-k":k,text:t});b.onclick=()=>{state.catKey=k;draw()};bar.append(b)});
+      view.append(el("h2",{text:L("어느 카테고리가 제일 센가","Which category is hottest"),style:"margin-top:10px"}),el("p",{class:"lead",id:"catlead"}),bar,board,el("p",{class:"asof",text:stamp(j.at,j.cached)+L(". 카테고리마다 인기 급상승 20개를 읽고 그 카테고리에 속한 영상만 남겼습니다. 한도는 약 20유닛입니다. 영상이 5개 미만인 카테고리(흐리게 표시)는 표본이 적어 순위에서 뺐습니다.",". For each category the top 20 trending videos are read and only that category's own videos are kept (about 20 quota units). Categories with fewer than 5 videos (dimmed) are left out of the ranking.")}));
+      draw();
+      rows.forEach((r,i)=>view.append(lane(cn(r.name),L(`조회수 중앙값 ${compact(r.median)}회, 영상 ${r.count}개`,`Median views ${compact(r.median)}, ${r.count} videos`),r.videos.slice(0,12),rankBadge,"","cat-"+i)));
+    } else if(state.tab==="trends"){
+      msg(L("읽는 중…","Loading…"));
+      const j=await call("/api/trends",{},refresh); msg("");
+      const num=t=>parseInt(String(t.traffic).replace(/[^\d]/g,""))||0, mx=Math.max(1,...j.data.map(num));
+      view.append(el("h2",{text:L("지금 사람들이 검색하는 것","What people are searching now"),style:"margin-top:10px"}),el("p",{class:"lead",text:stamp(j.at,j.cached)+L(". 구글 트렌드입니다. 이 탭은 유튜브 한도를 쓰지 않습니다.",". Google Trends. This tab does not use YouTube quota.")}));
+      const g=el("div",{class:"kw"});
+      j.data.forEach((t,i)=>g.append(el("a",{href:"https://www.google.com/search?q="+encodeURIComponent(t.title),target:"_blank",rel:"noopener"},
+        el("span",{class:"n",text:String(i+1)}),el("span",{class:"q",text:t.title}),el("span",{class:"t",text:t.traffic||""}),
+        el("div",{class:"bar"},el("i",{style:`width:${Math.max(3,num(t)/mx*100)}%`})))));
+      view.append(j.data.length?g:empty(L("급상승 검색어가 없습니다.","No trending searches.")));
+    } else {
+      const input=el("input",{type:"text",placeholder:L("주제 (예: 캠핑)","Topic (e.g. camping)"),value:state.topic,maxlength:"60","aria-label":L("주제","Topic")});
+      const days=el("select",{"aria-label":L("기간","Period")}); [3,7,14,30].forEach(v=>{const o=el("option",{value:v,text:L("최근 "+v+"일","Last "+v+" days")});if(v==state.days)o.selected=true;days.append(o)});
+      const go=el("button",{class:"primary",text:L("조회","Search")});
+      go.onclick=()=>{state.topic=input.value.trim();state.days=days.value;load(false)};
+      input.onkeydown=e=>{if(e.key==="Enter")go.click()};
+      view.append(el("h2",{text:L("궁금한 주제, 쇼츠로 파고들기","Dig into a topic through Shorts"),style:"margin-top:10px"}),el("div",{class:"ask"},input,days,go));
+      if(!state.topic){view.append(empty(L("주제를 입력하고 조회하세요. 검색 한 번에 API 약 100유닛을 쓰고, 같은 조회는 3시간 동안 저장된 결과를 보여 줍니다.","Enter a topic and search. One search uses about 100 API units; the same search shows the cached result for 3 hours.")));return}
+      const out=el("div"); view.append(out); msg(L("읽는 중…","Loading…"));
+      const j=await call("/api/topic",{q:state.topic,days:state.days},refresh); msg("");
+      const d=j.data;
+      out.append(facts([[L("쇼츠 수","Shorts"),d.summary.count,L("개","")],[L("조회수 중앙값","Median views"),compact(d.summary.median),L("회","")],[L("최고 조회수","Top views"),compact(d.summary.max),L("회","")],[L("작은 채널에서 터진 영상","Small-channel breakouts"),d.breakouts.length,L("개","")]]));
+      out.append(el("p",{class:"asof",text:L(`「${state.topic}」 최근 ${state.days}일. ${stamp(j.at,j.cached)}. 중앙값은 조회순 상위 25개 안에서 잰 값이라, 잘 나가는 쪽의 수준입니다.`,`"${state.topic}", last ${state.days} days. ${stamp(j.at,j.cached)}. The median is measured within the top 25 by views, so it reflects the high end, not a typical video.`)}));
+      out.append(lane(L("작은 채널에서 터진 영상","Breakouts from small channels"),L("구독자 1만 미만 채널입니다. 조회수를 구독자 수로 나눈 배수가 큰 순서입니다.","Channels under 10K subscribers, ordered by views divided by subscribers."),d.breakouts,rankBadge,L("해당하는 영상이 없습니다.","No matching videos.")));
+      out.append(lane(L("조회수 상위","Most viewed"),"",d.videos.slice(0,15),rankBadge,L("쇼츠가 없습니다.","No Shorts.")));
+      out.append(lane(L("최신 업로드순","Newest uploads"),"",byNew(d.videos).slice(0,15),agoBadge,""));
+    }
+  }catch(e){ msg(e.message,true); }
+}
+
+function keyForm(){
+  const d=$("#notice");d.replaceChildren();
+  const inp=el("input",{type:"password",id:"keyin",autocomplete:"off",spellcheck:"false",placeholder:"AIza..."});
+  const btn=el("button",{type:"button",text:L("저장하고 시작","Save and start")});
+  const out=el("p",{class:"keyout",role:"status"});
+  const go=async()=>{
+    btn.disabled=true;out.textContent=L("확인하는 중…","Checking…");
+    try{
+      const r=await fetch("/api/key",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:inp.value})});
+      const j=await r.json(); if(!r.ok) throw new Error(j.error||"error");
+      location.reload();
+    }catch(e){out.textContent=tr(e.message);btn.disabled=false}
+  };
+  btn.onclick=go; inp.onkeydown=e=>{if(e.key==="Enter")go()};
+  d.append(el("div",{class:"msg keybox"},
+    el("p",{text:L("처음 한 번만 YouTube API 키를 넣으면 됩니다. 키는 이 컴퓨터에만 저장되고 다른 곳으로 보내지 않습니다. 키 만드는 법은 README 의 안내를 따라 주세요. 검색어 급상승 탭은 키 없이 볼 수 있습니다.","Enter your YouTube API key once. It is stored only on this computer and never sent anywhere else. See the README for how to create one. The Rising searches tab works without a key.")}),
+    el("div",{class:"keyrow"},inp,btn),out));
+}
+(function applyLang(){
+  document.documentElement.lang=KO?"ko":"en";
+  const set=(id,ko,en)=>{const e=document.getElementById(id);if(e)e.textContent=L(ko,en)};
+  set("brand-name","튜브보드","TubeBoard");document.title=L("튜브보드","TubeBoard");set("l-kind","형식","Format");set("l-region","지역","Region");set("o-all","쇼츠+롱폼","Shorts + Long");set("o-short","쇼츠만","Shorts only");set("o-long","롱폼만","Long only");
+  set("refresh","새로 읽기","Refresh");$("#refresh").title=L("저장된 결과를 건너뛰고 다시 읽습니다. API 한도를 씁니다.","Skip the cache and fetch again. Uses API quota.");
+  set("t-popular","지금 뜨는 영상","Trending now");set("t-categories","카테고리 대결","Category showdown");set("t-trends","검색어 급상승","Rising searches");set("t-topic","주제로 파고들기","Topic deep-dive");
+  set("f-src","데이터 출처: YouTube Data API · Google 트렌드. 구독자 대비 배수와 중앙값은 이 프로그램이 계산한 값이며 YouTube 가 제공한 값이 아닙니다. 이 프로그램은 YouTube, Google 과 관계가 없는 비공식 도구입니다.","Data: YouTube Data API and Google Trends. Subscriber ratios and medians are calculated by this program, not provided by YouTube. This is an unofficial tool, not affiliated with YouTube or Google.");
+  set("f-ig","인스타그램은 공식 API 로 남의 릴스를 읽을 수 없어 이 화면에서 뺐습니다. 캡처로 확인하세요.","Instagram is not included because Reels of other accounts cannot be read through an official API.");
+  const lg=$("#lang");lg.value=KO?"ko":"en";lg.onchange=()=>{localStorage.setItem("lang",lg.value);location.reload()};
+})();
+(async function init(){
+  document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-selected",x.dataset.tab===state.tab));
+  const st=await (await fetch("/api/status")).json(); setQuota(st.quotaUsed,st.quotaLimit);
+  const sel=$("#region");
+  for(const [k,v] of Object.entries(st.regions)) sel.append(el("option",{value:k,text:`${KO?v:(REGION_EN[v]||v)} (${k})`}));
+  sel.value=state.region in st.regions?state.region:"KR"; state.region=sel.value;
+  sel.onchange=()=>{state.region=sel.value;localStorage.setItem("region",state.region);load(false)};
+  $("#refresh").onclick=()=>load(true);
+  $("#kind").onchange=e=>{state.kind=e.target.value;load(false)};
+  document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{
+    document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
+    state.tab=b.dataset.tab; load(false);
+  });
+  if(!st.hasKey) keyForm();
+  else load(false);
+})();
+</script>
+</body>
+</html>

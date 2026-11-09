@@ -1,12 +1,14 @@
 """유튜브 Data API v3 (공개 데이터, API 키). 표준 라이브러리만 쓴다."""
 import json
 import os
+import re
 import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
 
 from . import cache, logic
+from .paths import data_dir
 
 API = "https://www.googleapis.com/youtube/v3"
 COSTS = {"search": 100, "videos": 1, "channels": 1}
@@ -22,7 +24,7 @@ class QuotaExceeded(ApiError):
 
 def load_env():
     """trend/.env 의 KEY=값 줄을 환경변수로 (이미 있는 환경변수가 우선)."""
-    path = Path(__file__).resolve().parent.parent / ".env"
+    path = data_dir() / ".env"
     if not path.exists():
         return
     for raw in path.read_text(encoding="utf-8").splitlines():
@@ -37,8 +39,45 @@ def api_key():
     load_env()
     key = os.environ.get("YOUTUBE_API_KEY", "").strip()
     if not key:
-        raise ApiError("YOUTUBE_API_KEY 가 없습니다. .env 파일에 키를 넣어 주세요 (README 참고).")
+        raise ApiError("YOUTUBE_API_KEY 가 없습니다. 화면에서 키를 입력하거나 .env 파일에 넣어 주세요 (README 참고).")
     return key
+
+
+KEY_RE = re.compile(r"^[A-Za-z0-9_\-]{20,80}$")
+
+
+def save_key(key):
+    """화면에서 받은 키를 확인(1유닛)하고 .env 에 저장한다. 키는 이 컴퓨터 밖으로 나가지 않는다."""
+    key = (key or "").strip()
+    if not KEY_RE.match(key):
+        raise ApiError("키 형식이 올바르지 않습니다. 구글 클라우드에서 만든 API 키를 그대로 붙여넣어 주세요.")
+    q = urllib.parse.urlencode({"part": "id", "chart": "mostPopular", "maxResults": 1, "key": key})
+    try:
+        urllib.request.urlopen(f"{API}/videos?{q}", timeout=30).read()
+    except urllib.error.HTTPError as e:
+        try:
+            reason = (json.loads(e.read().decode("utf-8", "replace"))["error"].get("errors") or [{}])[0].get("reason", "")
+        except (ValueError, KeyError):
+            reason = ""
+        if reason in ("quotaExceeded", "rateLimitExceeded", "dailyLimitExceeded"):
+            pass  # 키는 맞고 한도만 찬 것
+        elif reason in ("keyInvalid", "badRequest") or e.code in (400, 403):
+            raise ApiError("키가 맞지 않거나 YouTube Data API v3 가 켜져 있지 않습니다. README 의 키 발급 단계를 확인해 주세요.")
+        else:
+            raise ApiError(f"유튜브 API 오류 {e.code}")
+    except urllib.error.URLError as e:
+        raise ApiError(f"네트워크 오류: {e.reason}")
+    path = data_dir() / ".env"
+    lines = []
+    if path.exists():
+        lines = [l for l in path.read_text(encoding="utf-8").splitlines() if not l.strip().startswith("YOUTUBE_API_KEY")]
+    lines.append(f"YOUTUBE_API_KEY={key}")
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    try:
+        os.chmod(path, 0o600)
+    except OSError:
+        pass
+    os.environ["YOUTUBE_API_KEY"] = key
 
 
 def request(path, params):
