@@ -76,4 +76,11 @@ MIT (LICENSE 참고)
 ## 안내
 
 - 이 프로그램은 YouTube, Google 과 관계가 없는 비공식 도구입니다. YouTube 는 Google LLC 의 상표입니다.
-- 사용자 본인의 YouTube Data API 키로 동작하며, 사용할 때 [YouTube API 서비스 약관](https://developers.google.com/youtube/terms/api-services-terms-of-service)을 지켜야 합니다. [확인 필요: 데이터 저장 · 표시 조건]
+- 사용자 본인의 YouTube Data API 키로 동작합니다. 사용할 때 [YouTube 이용약관](https://www.youtube.com/t/terms)과 [YouTube API 서비스 약관](https://developers.google.com/youtube/terms/api-services-terms-of-service), [개발자 정책](https://developers.google.com/youtube/terms/developer-policies)을 지켜야 합니다. 이 프로그램은 YouTube API 서비스를 사용하며, 구글의 [개인정보처리방침](https://policies.google.com/privacy)이 적용됩니다.
+- **계산한 값**: 구독자 대비 배수, 중앙값, 카테고리 합계는 이 프로그램이 API 가 준 값으로 계산한 것이며 YouTube 가 제공한 값이 아닙니다.
+- **개인정보**: 서버나 계정이 없습니다. 내 컴퓨터(127.0.0.1)에서만 동작하고, 사용자 정보를 모으거나 밖으로 보내지 않습니다. 읽어 온 결과는 내 컴퓨터의 `.cache/` 에 15분~3시간만 저장합니다.
+- **구글 급상승 검색어 탭**은 구글 트렌드가 공개한 RSS 를 읽습니다. 이 방식이 YouTube API 약관의 스크레이핑 금지 조항에 해당하는지는 확인하지 못했습니다. [확인 필요] 마음에 걸리면 이 탭을 쓰지 않으면 됩니다(키와 한도에는 영향 없음).
+
+## 기여
+
+이슈와 제안은 저장소의 Issues 로 받습니다.
