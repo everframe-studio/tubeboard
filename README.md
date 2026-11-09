@@ -15,8 +15,8 @@
 Python 3.9 이상만 있으면 됩니다. 외부 패키지는 필요 없습니다.
 
 ```bash
-git clone <이 저장소 주소> trend
-cd trend
+git clone https://github.com/everframe-studio/tubeboard.git
+cd tubeboard
 cp .env.example .env     # 열어서 YOUTUBE_API_KEY= 뒤에 본인 키를 붙여 넣습니다
 python3 -m tubeboard
 ```
