@@ -12,6 +12,8 @@ What it shows
 - **Rising searches**: what people are searching on Google right now (no key or quota needed)
 - **Topic deep-dive**: enter a topic and see the most viewed Shorts of the last N days, plus **breakouts from channels under 10K subscribers** ordered by views divided by subscribers. Big channels succeed because of their audience, so there is little to copy; when a small channel's video takes off, the topic or format itself worked. This is an assumption, not a fact.
 
+The default region is South Korea; you can switch to 12 regions on screen (KR, US, JP, GB, DE, FR, BR, IN, ID, TW, VN, TH). The category showdown and rising searches also follow the selected region.
+
 Instagram is not included because Reels of other accounts cannot be read through an official API.
 
 The interface is available in Korean and English. Use the language selector at the top right; the first load follows your browser language.
